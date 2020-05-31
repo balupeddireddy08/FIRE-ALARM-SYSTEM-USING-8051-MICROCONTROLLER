@@ -1,0 +1,101 @@
+C51 COMPILER V9.60.0.0   FIREALERTSYSTEMCODE                                               05/18/2020 09:12:52 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE FIREALERTSYSTEMCODE
+OBJECT MODULE PLACED IN .\Objects\firealertsystemcode.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE firealertsystemcode.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(
+                    -.\Listings\firealertsystemcode.lst) TABS(2) OBJECT(.\Objects\firealertsystemcode.obj)
+
+line level    source
+
+   1          #include<reg51.h> //header file of 51 families
+   2          sbit sensor=P1^0; //_sbit is the datatype used to assign single _bit to i/o _bit
+   3          sbit rs=P1^1; //rs pin enables a user to select Instr or Char mode 
+   4          sbit rw=P1^2; //read and write information of lcd
+   5          sbit en=P1^3; //enable pin latches the info at datapins
+   6          sbit buzzer=P3^0;
+   7          //Definiging the functions
+   8          void lcdinit(); //lcd intializing function
+   9          void lcddat(unsigned char); //by this function characters are passed on to the LCD screen
+  10          void lcdcmd(unsigned char); //send command on lcd
+  11          void lcddis(unsigned char *); //text to display on the LCD
+  12          void delay(); //to delay for some time
+  13          void main()
+  14          {
+  15   1        buzzer=0;
+  16   1        sensor=0;
+  17   1        back:lcdinit();
+  18   1        lcddis("  FIRE ALERT   "); //message display on the screen
+  19   1        lcdcmd(0xc0); //this command will force the cursor to second line
+  20   1        lcddis("   SYSTEM ");
+  21   1        delay();
+  22   1        while(1)
+  23   1        {
+  24   2          if(sensor==1)
+  25   2          {
+  26   3            lcdcmd(0x01); //clear the display
+  27   3            lcddis("FIRE OCCURED");
+  28   3            lcdcmd(0xc0);
+  29   3            lcddis("MOVE FROM EXIT");
+  30   3            delay();
+  31   3            delay();
+  32   3            buzzer=1;
+  33   3          }
+  34   2          goto back;
+  35   2        }
+  36   1      }
+  37          void lcdinit()
+  38          {
+  39   1        lcdcmd(0x38); //initialize all the crystals in lcd 
+  40   1        lcdcmd(0x01);// clear the screen
+  41   1        lcdcmd(0x10); //shift the cursor to left
+  42   1        lcdcmd(0x0c); //it displays the cursor blinking
+  43   1        lcdcmd(0x80); //set DDRAM address or coursor positin on display
+  44   1      }
+  45          void lcdcmd(unsigned char val)
+  46          {
+  47   1        P2=val; //
+  48   1        rs=0; //instr cmd rig is selected ,allow to send cmd  
+  49   1        rw=0;//write operation is done
+  50   1        en=1;
+  51   1        delay();
+  52   1        en=0;
+  53   1      }
+  54          void lcddat(unsigned char dat)
+C51 COMPILER V9.60.0.0   FIREALERTSYSTEMCODE                                               05/18/2020 09:12:52 PAGE 2   
+
+  55          {
+  56   1        P2=dat;
+  57   1        rs=1; //_data _register is selected, allowing the user to send _data
+  58   1        rw=0;
+  59   1        en=1;
+  60   1        delay();
+  61   1        en=0;
+  62   1      }
+  63          void lcddis(unsigned char *s)
+  64          {
+  65   1        unsigned char w;
+  66   1        for(w=0;s[w]!='\0';w++)
+  67   1        {
+  68   2        lcddat(s[w]); 
+  69   2        }
+  70   1      }
+  71          void delay()
+  72          {
+  73   1        unsigned int v1;
+  74   1        for(v1=0;v1<10000;v1++);
+  75   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    177    ----
+   CONSTANT SIZE    =     55    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
